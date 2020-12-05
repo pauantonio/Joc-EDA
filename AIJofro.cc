@@ -27,18 +27,26 @@ struct PLAYER_NAME : public Player {
     Pos p = citizen(id).pos;
     bool money_nearby = false;
     Dir money_dir;
-
-    for (Dir d : dirs) {
+    
+    for (int i = 0; !money_nearby and i < 4; ++i) {
+      Dir d = dirs[i];
       Pos new_pos = p+d;
       if (pos_ok(new_pos) and cell(new_pos).bonus == Money) {
         money_nearby = true;
         money_dir = d;
       }
+  	}
 
-      else {
+    if (money_nearby) move(id, money_dir);
+    else {
+      for (int i = 0; !money_nearby and i < 4; ++i) {
+        Dir d = dirs[i];
+        Pos new_pos = p+d;
+
         if (d == Up) {
-          for (Dir d2 : {Up, Right}) {
-            Pos new_pos2 = new_pos + d2;
+          const vector<Dir> dirs2 = {Up,Right};
+          for (int j = 0; !money_nearby and j < 2; ++j) {
+            Pos new_pos2 = new_pos + dirs2[j];
             if (pos_ok(new_pos2) and cell(new_pos2).bonus == Money) {
               money_nearby = true;
               money_dir = d;
@@ -47,8 +55,9 @@ struct PLAYER_NAME : public Player {
         }
 
         else if (d == Right) {
-          for (Dir d2 : {Right, Down}) {
-            Pos new_pos2 = new_pos + d2;
+          const vector<Dir> dirs2 = {Right,Down};
+          for (int j = 0; !money_nearby and j < 2; ++j) {
+            Pos new_pos2 = new_pos + dirs2[j];
             if (pos_ok(new_pos2) and cell(new_pos2).bonus == Money) {
               money_nearby = true;
               money_dir = d;
@@ -57,8 +66,9 @@ struct PLAYER_NAME : public Player {
         }
 
         else if (d == Down) {
-          for (Dir d2 : {Down, Left}) {
-            Pos new_pos2 = new_pos + d2;
+          const vector<Dir> dirs2 = {Down,Left};
+          for (int j = 0; !money_nearby and j < 2; ++j) {
+            Pos new_pos2 = new_pos + dirs2[j];
             if (pos_ok(new_pos2) and cell(new_pos2).bonus == Money) {
               money_nearby = true;
               money_dir = d;
@@ -67,8 +77,9 @@ struct PLAYER_NAME : public Player {
         }
 
         else {
-          for (Dir d2 : {Left, Up}) {
-            Pos new_pos2 = new_pos + d2;
+          const vector<Dir> dirs2 = {Left,Up};
+          for (int j = 0; !money_nearby and j < 2; ++j) {
+            Pos new_pos2 = new_pos + dirs2[j];
             if (pos_ok(new_pos2) and cell(new_pos2).bonus == Money) {
               money_nearby = true;
               money_dir = d;
@@ -76,12 +87,16 @@ struct PLAYER_NAME : public Player {
           }
         }
       }
-  	}
-
-    if (money_nearby) move(id, money_dir);
-    else {
-      Dir random_dir = dirs[random(0,3)];
-	    if (pos_ok(p+random_dir) and (cell(p+random_dir).id == -1 or citizen(cell(p+random_dir).id).type == Builder)) move(id,random_dir);
+      
+      if (money_nearby and cell(p+money_dir).type == Street) move(id, money_dir);
+      else {
+        Dir random_dir = dirs[random(0,3)];
+	      if (pos_ok(p+random_dir) and cell(p+random_dir).type == Street) move(id,random_dir);
+        else {
+          Dir random_dir2 = dirs[random(0,3)];
+	        if (pos_ok(p+random_dir2) and cell(p+random_dir2).type == Street) move(id,random_dir2);
+        }
+      }
     }
   }
   /**
