@@ -22,7 +22,7 @@ struct PLAYER_NAME : public Player {
    * Types and attributes for your player can be defined here.
    */
   const vector<Dir> dirs = {Up,Down,Left,Right};
-
+/*
   void search (const int& id) {
     Pos p = citizen(id).pos;
     bool money_nearby = false;
@@ -98,6 +98,42 @@ struct PLAYER_NAME : public Player {
         }
       }
     }
+  }*/
+
+  void money_search (const int& id) {
+    Pos p = citizen(id).pos;
+    set<Pos> visited_cells;
+    visited_cells.emplace(p);
+    queue<pair<Pos, Dir>> to_visit_cells;
+    Dir money_dir;
+
+    for (Dir d : dirs) {
+      Pos new_pos = p + d;
+      if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street) {
+        to_visit_cells.push(make_pair(new_pos, d));
+      }
+    }
+
+    while(to_visit_cells.size() > 0) {
+      Pos possible_cell = to_visit_cells.front().first;
+      Dir possible_dir = to_visit_cells.front().second;
+      to_visit_cells.pop();
+      visited_cells.emplace(possible_cell);
+
+      if (cell(possible_cell).bonus == Money) {
+        money_dir = possible_dir;
+        break;
+      }
+
+      for (Dir d : dirs) {
+        Pos new_pos = possible_cell + d;
+        if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street) {
+          to_visit_cells.emplace(new_pos, possible_dir);
+        }
+      }
+    }
+
+    move(id, money_dir);
   }
   /**
    * Play method, invoked once per each round.
@@ -115,8 +151,8 @@ struct PLAYER_NAME : public Player {
     else {                                  // THE CURRENT ROUND IS NIGHT
 
     }*/
-    for (int id : b) search(id);
-    for (int id : w) search(id);
+    for (int id : b) money_search(id);
+    for (int id : w) money_search(id);
   }
 
 };
