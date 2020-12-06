@@ -1,4 +1,4 @@
-DUMMY_OBJ = AIDummy.o
+DUMMY_OBJ = AIDummy.o.Linux64
 
 # Add here any extra .o player files you want to link to the executable
 EXTRA_OBJ =

@@ -22,137 +22,86 @@ struct PLAYER_NAME : public Player {
    * Types and attributes for your player can be defined here.
    */
   const vector<Dir> dirs = {Up,Down,Left,Right};
-/*
-  void search (const int& id) {
-    Pos p = citizen(id).pos;
-    bool money_nearby = false;
-    Dir money_dir;
-    
-    for (int i = 0; !money_nearby and i < 4; ++i) {
-      Dir d = dirs[i];
-      Pos new_pos = p+d;
-      if (pos_ok(new_pos) and cell(new_pos).bonus == Money) {
-        money_nearby = true;
-        money_dir = d;
-      }
-  	}
 
-    if (money_nearby) move(id, money_dir);
-    else {
-      for (int i = 0; !money_nearby and i < 4; ++i) {
-        Dir d = dirs[i];
-        Pos new_pos = p+d;
+  int num_barricades = 0;
 
-        if (d == Up) {
-          const vector<Dir> dirs2 = {Up,Right};
-          for (int j = 0; !money_nearby and j < 2; ++j) {
-            Pos new_pos2 = new_pos + dirs2[j];
-            if (pos_ok(new_pos2) and cell(new_pos2).bonus == Money) {
-              money_nearby = true;
-              money_dir = d;
-            }
-          }
-        }
+  bool evaluate_conditions (const int& id, const Pos& p) {
+    if (is_day()) {
+      if (citizen(id).type == Builder) return (citizen(id).life < builder_ini_life() and cell(p).bonus == Food) or (cell(p).bonus == Money);
 
-        else if (d == Right) {
-          const vector<Dir> dirs2 = {Right,Down};
-          for (int j = 0; !money_nearby and j < 2; ++j) {
-            Pos new_pos2 = new_pos + dirs2[j];
-            if (pos_ok(new_pos2) and cell(new_pos2).bonus == Money) {
-              money_nearby = true;
-              money_dir = d;
-            }
-          }
-        }
-
-        else if (d == Down) {
-          const vector<Dir> dirs2 = {Down,Left};
-          for (int j = 0; !money_nearby and j < 2; ++j) {
-            Pos new_pos2 = new_pos + dirs2[j];
-            if (pos_ok(new_pos2) and cell(new_pos2).bonus == Money) {
-              money_nearby = true;
-              money_dir = d;
-            }
-          }
-        }
-
-        else {
-          const vector<Dir> dirs2 = {Left,Up};
-          for (int j = 0; !money_nearby and j < 2; ++j) {
-            Pos new_pos2 = new_pos + dirs2[j];
-            if (pos_ok(new_pos2) and cell(new_pos2).bonus == Money) {
-              money_nearby = true;
-              money_dir = d;
-            }
-          }
-        }
-      }
-      
-      if (money_nearby and cell(p+money_dir).type == Street) move(id, money_dir);
-      else {
-        Dir random_dir = dirs[random(0,3)];
-	      if (pos_ok(p+random_dir) and cell(p+random_dir).type == Street) move(id,random_dir);
-        else {
-          Dir random_dir2 = dirs[random(0,3)];
-	        if (pos_ok(p+random_dir2) and cell(p+random_dir2).type == Street) move(id,random_dir2);
-        }
-      }
+      else return (cell(p).weapon != NoWeapon and cell(p).weapon > citizen(id).weapon) or (citizen(id).life < warrior_ini_life() and cell(p).bonus == Food) or (cell(p).bonus == Money);
     }
-  }*/
 
-  void money_search (const int& id) {
+    else {
+      if (citizen(id).type == Builder) return (citizen(id).life < builder_ini_life() and cell(p).bonus == Food) or (cell(p).bonus == Money) /*or (cell(p).b_owner == me())*/;
+
+      else return (cell(p).id != -1 and citizen(cell(p).id).player != me() and ((citizen(cell(p).id).type == Builder) or (citizen(cell(p).id).weapon < citizen(id).weapon) or (citizen(cell(p).id).life < citizen(id).life))); 
+    }
+  }
+
+  void bfs_search (const int& id) {
     Pos p = citizen(id).pos;
     set<Pos> visited_cells;
     visited_cells.emplace(p);
-    queue<pair<Pos, Dir>> to_visit_cells;
-    Dir money_dir;
+    queue<pair<pair<Pos, Dir>, int>> to_visit_cells;
 
     for (Dir d : dirs) {
       Pos new_pos = p + d;
-      if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street) {
-        to_visit_cells.push(make_pair(new_pos, d));
+      if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+        to_visit_cells.push(make_pair(make_pair(new_pos, d), 1));
       }
     }
 
     while(to_visit_cells.size() > 0) {
-      Pos possible_cell = to_visit_cells.front().first;
-      Dir possible_dir = to_visit_cells.front().second;
+      Pos possible_cell = to_visit_cells.front().first.first;
+      Dir possible_dir = to_visit_cells.front().first.second;
+      int cont = to_visit_cells.front().second;
       to_visit_cells.pop();
       visited_cells.emplace(possible_cell);
 
-      if (cell(possible_cell).bonus == Money) {
-        money_dir = possible_dir;
-        break;
+      if (cont >= 15) {
+        Dir random_dir = dirs[random(0,3)];
+        Pos new_pos = p + random_dir;
+        if (pos_ok(new_pos) and cell(new_pos).type == Street) {
+          move(id, random_dir);
+          return;
+        }
+      }
+
+      if (is_day() and citizen(id).type == Builder and num_barricades < max_num_barricades() and random(1, 5) == 1) {
+        Dir random_dir = dirs[random(0,3)];
+        Pos new_pos = p + random_dir;
+        if (pos_ok(new_pos) and cell(new_pos).is_empty()) {
+          build(id, random_dir);
+          return;
+        }
+      }
+
+      if (evaluate_conditions(id, possible_cell)) {
+        move(id, possible_dir);
+        return;
       }
 
       for (Dir d : dirs) {
         Pos new_pos = possible_cell + d;
-        if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street) {
-          to_visit_cells.emplace(new_pos, possible_dir);
+        if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+          to_visit_cells.push(make_pair(make_pair(new_pos, possible_dir), cont++));
         }
       }
     }
-
-    move(id, money_dir);
   }
+
   /**
    * Play method, invoked once per each round.
    */
   virtual void play () {
     vector<int> b = builders(me());         // BUILDERS IDs
     vector<int> w = warriors(me());         // WARRIORS IDs
-    /*
-    if (is_day()) {                         // THE CURRENT ROUND IS DAY
-      for (int id : b) {
-
-      }
-    }
-
-    else {                                  // THE CURRENT ROUND IS NIGHT
-
-    }*/
-    for (int id : b) money_search(id);
-    for (int id : w) money_search(id);
+    num_barricades = 0;
+    for (int i = 0; i < b.size(); ++i) num_barricades += barricades(b[i]).size();
+    
+    for (int id : b) bfs_search(id);
+    for (int id : w) bfs_search(id);
   }
 
 };
