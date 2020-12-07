@@ -1,7 +1,7 @@
 DUMMY_OBJ = AIDummy.o.Linux64
 
 # Add here any extra .o player files you want to link to the executable
-EXTRA_OBJ =
+EXTRA_OBJ = AIHorseLuis512.o
 
 # Configuration
 OPTIMIZE = 3 # Optimization level    (0 to 3)
@@ -39,7 +39,8 @@ OBJ = Structs.o Settings.o State.o Info.o Random.o Board.o Action.o Player.o Reg
 all: Game
 
 clean:
-	rm -rf Game  *.o *.exe Makefile.deps
+	rm -rf Game  *.exe Makefile.deps
+	find . -type f -name '*.o' -not -name 'AIHorseLuis512.o' -delete
 
 Game:  $(OBJ) Game.o Main.o $(PLAYERS_OBJ) 
 	$(CXX) $^ -o $@ $(LDFLAGS)
