@@ -5,7 +5,7 @@
  * Write the name of your player and save this file
  * with the same name and .cc extension.
  */
-#define PLAYER_NAME Jofro2
+#define PLAYER_NAME Jofro3
 
 
 struct PLAYER_NAME : public Player {
@@ -120,7 +120,7 @@ struct PLAYER_NAME : public Player {
         }
       }
 
-      if ((cell(possible_cell).bonus == Money) or (cell(possible_cell).weapon != NoWeapon and cell(possible_cell).weapon > citizen(id).weapon) or (citizen(id).life < warrior_ini_life() and cell(possible_cell).bonus == Food) or (cell(possible_cell).weapon != NoWeapon and cell(possible_cell).weapon <= citizen(id).weapon)) {
+      if ((cell(possible_cell).bonus == Money) or (cell(possible_cell).weapon != NoWeapon and cell(possible_cell).weapon > citizen(id).weapon) or (citizen(id).life < warrior_ini_life() and cell(possible_cell).bonus == Food) or (cell(possible_cell).weapon != NoWeapon)) {
         move(id, possible_dir);
         return;
       }
@@ -231,7 +231,7 @@ struct PLAYER_NAME : public Player {
         }
       }
 
-      if ((cell(possible_cell).id != -1 and citizen(cell(possible_cell).id).player != me() and ((citizen(cell(possible_cell).id).type == Builder) or (citizen(cell(possible_cell).id).weapon < citizen(id).weapon) or (citizen(cell(possible_cell).id).life < citizen(id).life)))) {
+      if ((cell(possible_cell).id != -1 and citizen(cell(possible_cell).id).player != me() and ((citizen(cell(possible_cell).id).type == Builder) or (citizen(cell(possible_cell).id).weapon < citizen(id).weapon) or (citizen(cell(possible_cell).id).life < citizen(id).life))) or (cell(possible_cell).weapon != NoWeapon and cell(possible_cell).weapon > citizen(id).weapon) or (cell(possible_cell).bonus == Money)) {
         move(id, possible_dir);
         return;
       }
