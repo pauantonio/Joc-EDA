@@ -38,20 +38,26 @@ struct PLAYER_NAME : public Player {
     visited_cells.emplace(p);
     queue<pair<pair<Pos, Dir>, int>> to_visit_cells;
 
-    if (num_barricades < max_num_barricades()) {
+    for (Dir d : dirs) {
+      Pos new_pos = p + d;
+      if (pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+        to_visit_cells.push(make_pair(make_pair(new_pos, d), 1));
+
+        if (cell(new_pos).is_empty() and cell(p).b_owner == -1 and cell(new_pos).b_owner == me() and cell(new_pos).resistance < barricade_max_resistance()) {
+          build(id, d);
+          ++num_barricades;
+          return;
+        }
+      }
+    }
+
+    if (cell(p).b_owner == -1 and num_barricades < max_num_barricades()) {
       Dir random_dir = dirs[random(0,3)];
       Pos new_pos = p + random_dir;
       if (pos_ok(new_pos) and cell(new_pos).is_empty()) {
         build(id, random_dir);
         ++num_barricades;
         return;
-      }
-    }
-
-    for (Dir d : dirs) {
-      Pos new_pos = p + d;
-      if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
-        to_visit_cells.push(make_pair(make_pair(new_pos, d), 1));
       }
     }
 
@@ -71,7 +77,7 @@ struct PLAYER_NAME : public Player {
         }
       }
 
-      if ((cell(possible_cell).bonus == Money) or (citizen(id).life < builder_ini_life() and cell(possible_cell).bonus == Food)) {
+      if ((cell(possible_cell).bonus == Money) or (citizen(id).life < builder_ini_life() and cell(possible_cell).bonus == Food) or (cell(possible_cell).weapon != NoWeapon)) {
         move(id, possible_dir);
         return;
       }
@@ -93,7 +99,7 @@ struct PLAYER_NAME : public Player {
 
     for (Dir d : dirs) {
       Pos new_pos = p + d;
-      if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+      if (pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
         to_visit_cells.push(make_pair(make_pair(new_pos, d), 1));
       }
     }
@@ -114,7 +120,7 @@ struct PLAYER_NAME : public Player {
         }
       }
 
-      if ((cell(possible_cell).bonus == Money) or (cell(possible_cell).weapon != NoWeapon and cell(possible_cell).weapon > citizen(id).weapon) or (citizen(id).life < warrior_ini_life() and cell(possible_cell).bonus == Food)) {
+      if ((cell(possible_cell).bonus == Money) or (cell(possible_cell).weapon != NoWeapon and cell(possible_cell).weapon > citizen(id).weapon) or (citizen(id).life < warrior_ini_life() and cell(possible_cell).bonus == Food) or (cell(possible_cell).weapon != NoWeapon and cell(possible_cell).weapon <= citizen(id).weapon)) {
         move(id, possible_dir);
         return;
       }
@@ -138,7 +144,7 @@ struct PLAYER_NAME : public Player {
 
     for (Dir d : dirs) {
       Pos new_pos = p + d;
-      if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+      if (pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
         to_visit_cells.push(make_pair(make_pair(new_pos, d), 1));
       }
     }
@@ -181,7 +187,7 @@ struct PLAYER_NAME : public Player {
 
     for (Dir d : dirs) {
       Pos new_pos = p + d;
-      if (visited_cells.find(new_pos) == visited_cells.end() and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+      if (pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
         to_visit_cells.push(make_pair(make_pair(new_pos, d), 1));
 
         if ((cell(new_pos).id != -1) and (citizen(cell(new_pos).id).player != me()) and (citizen(cell(new_pos).id).type == Warrior) and ((citizen(cell(new_pos).id).weapon > citizen(id).weapon) or ((citizen(cell(new_pos).id).weapon == citizen(id).weapon) and (citizen(cell(new_pos).id).life > citizen(id).life)))) {
