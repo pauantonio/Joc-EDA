@@ -13,7 +13,7 @@ import random
 import os
 import sys
 
-N_PARTIDES = 10
+N_PARTIDES = 100
 
 def play(p1, p2, p3, p4):
     players = set()
