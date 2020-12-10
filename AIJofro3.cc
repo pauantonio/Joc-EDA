@@ -42,22 +42,17 @@ struct PLAYER_NAME : public Player {
       Pos new_pos = p + d;
       if (pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
         to_visit_cells.push(make_pair(make_pair(new_pos, d), 1));
-/*      // NO MILLORAR BARRICADES
-        if (cell(new_pos).is_empty() and cell(p).b_owner == -1 and cell(new_pos).b_owner == me() and cell(new_pos).resistance < barricade_max_resistance()) {
+
+        if (cell(p).b_owner == -1 and num_barricades < max_num_barricades() and pos_ok(new_pos) and cell(new_pos).is_empty()) {
           build(id, d);
           ++num_barricades;
           return;
-        }*/
-      }
-    }
-
-    if (cell(p).b_owner == -1 and num_barricades < max_num_barricades()) {
-      Dir random_dir = dirs[random(0,3)];
-      Pos new_pos = p + random_dir;
-      if (pos_ok(new_pos) and cell(new_pos).is_empty()) {
-        build(id, random_dir);
-        ++num_barricades;
-        return;
+        }
+      
+        else if (cell(p).b_owner == -1 and cell(new_pos).b_owner == me() and cell(new_pos).resistance < barricade_max_resistance()) {
+          build(id, d);
+          return;
+        }
       }
     }
 
@@ -67,7 +62,7 @@ struct PLAYER_NAME : public Player {
       int cont = to_visit_cells.front().second;
       to_visit_cells.pop();
       visited_cells.emplace(possible_cell);
-
+/*
       if (cont >= 15) {
         Dir random_dir = dirs[random(0,3)];
         Pos new_pos = p + random_dir;
@@ -75,9 +70,9 @@ struct PLAYER_NAME : public Player {
           move(id, random_dir);
           return;
         }
-      }
+      }*/
 
-      if ((cell(possible_cell).bonus == Money) or (citizen(id).life < builder_ini_life() and cell(possible_cell).bonus == Food) or (cell(possible_cell).weapon != NoWeapon)) {
+      if ((cell(possible_cell).bonus == Money) or (citizen(id).life < builder_ini_life() and cell(possible_cell).bonus == Food)/* or (cell(possible_cell).weapon != NoWeapon)*/) {
         move(id, possible_dir);
         return;
       }
