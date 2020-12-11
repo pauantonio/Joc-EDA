@@ -8,7 +8,7 @@ import sys
 from multiprocessing import Pool, Lock, current_process, Value
 from collections import defaultdict
 
-N_THREADS = 6 # Recomanació: 2*(nombre de nuclis) - 1 o 2*(nombre de nuclis) - 2
+N_THREADS = 10 # Recomanació: 2*(nombre de nuclis) - 1 o 2*(nombre de nuclis) - 2
 
 total = Value('i', 0)
 N_PARTIDES = None

@@ -62,15 +62,15 @@ struct PLAYER_NAME : public Player {
       int cont = to_visit_cells.front().second;
       to_visit_cells.pop();
       visited_cells.emplace(possible_cell);
-/*
-      if (cont >= 15) {
+
+      if (cont >= 20) {
         Dir random_dir = dirs[random(0,3)];
         Pos new_pos = p + random_dir;
         if (pos_ok(new_pos) and cell(new_pos).type == Street) {
           move(id, random_dir);
           return;
         }
-      }*/
+      }
 
       if ((cell(possible_cell).bonus == Money) or (citizen(id).life < builder_ini_life() and cell(possible_cell).bonus == Food)/* or (cell(possible_cell).weapon != NoWeapon)*/) {
         move(id, possible_dir);
@@ -106,7 +106,7 @@ struct PLAYER_NAME : public Player {
       to_visit_cells.pop();
       visited_cells.emplace(possible_cell);
 
-      if (cont >= 15) {
+      if (cont >= 20) {
         Dir random_dir = dirs[random(0,3)];
         Pos new_pos = p + random_dir;
         if (pos_ok(new_pos) and cell(new_pos).type == Street) {
@@ -165,7 +165,7 @@ struct PLAYER_NAME : public Player {
       to_visit_cells.pop();
       visited_cells.emplace(possible_cell);
 
-      if (cont >= 15) {
+      if (cont >= 20) {
         Dir random_dir = dirs[random(0,3)];
         Pos new_pos = p + random_dir;
         if (pos_ok(new_pos) and cell(new_pos).type == Street) {
@@ -217,7 +217,7 @@ struct PLAYER_NAME : public Player {
       to_visit_cells.pop();
       visited_cells.emplace(possible_cell);
 
-      if (cont >= 15) {
+      if (cont >= 20) {
         Dir random_dir = dirs[random(0,3)];
         Pos new_pos = p + random_dir;
         if (pos_ok(new_pos) and cell(new_pos).type == Street) {
