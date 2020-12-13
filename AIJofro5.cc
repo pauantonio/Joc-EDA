@@ -5,7 +5,7 @@
  * Write the name of your player and save this file
  * with the same name and .cc extension.
  */
-#define PLAYER_NAME Jofro4
+#define PLAYER_NAME Jofro5
 
 
 struct PLAYER_NAME : public Player {
@@ -139,7 +139,7 @@ struct PLAYER_NAME : public Player {
 
     for (Dir d : dirs) {
       Pos new_pos = p + d;
-      if (pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+      if (pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or (cell(new_pos).b_owner == me() and cell(new_pos).id == -1))) {
         to_visit_cells.push(make_pair(make_pair(new_pos, d), 1));
 
         if (cell(p).b_owner == me() and cell(new_pos).id != -1 and weapon_strength_demolish(citizen(cell(new_pos).id).weapon) > cell(p).resistance) {
@@ -183,7 +183,7 @@ struct PLAYER_NAME : public Player {
 
       for (Dir d : dirs) {
         Pos new_pos = possible_cell + d;
-        if (!visited_cells[new_pos.i][new_pos.j] and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+        if (!visited_cells[new_pos.i][new_pos.j] and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or (cell(new_pos).b_owner == me() and cell(new_pos).id == -1))) {
           to_visit_cells.push(make_pair(make_pair(new_pos, possible_dir), cont++));
         }
       }
@@ -199,7 +199,7 @@ struct PLAYER_NAME : public Player {
 
     for (Dir d : dirs) {
       Pos new_pos = p + d;
-      if (pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+      if (pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or (cell(new_pos).b_owner == me() and cell(new_pos).id == -1))) {
         to_visit_cells.push(make_pair(make_pair(new_pos, d), 1));
 
         if ((cell(new_pos).id != -1) and (citizen(cell(new_pos).id).player != me()) and (citizen(cell(new_pos).id).type == Warrior) and ((citizen(cell(new_pos).id).weapon > citizen(id).weapon) or ((citizen(cell(new_pos).id).weapon == citizen(id).weapon) and (citizen(cell(new_pos).id).life > citizen(id).life)))) {
@@ -236,7 +236,7 @@ struct PLAYER_NAME : public Player {
 
       for (Dir d : dirs) {
         Pos new_pos = possible_cell + d;
-        if (!visited_cells[new_pos.i][new_pos.j] and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or cell(new_pos).b_owner == me())) {
+        if (!visited_cells[new_pos.i][new_pos.j] and pos_ok(new_pos) and cell(new_pos).type == Street and (cell(new_pos).b_owner == -1 or (cell(new_pos).b_owner == me() and cell(new_pos).id == -1))) {
           to_visit_cells.push(make_pair(make_pair(new_pos, possible_dir), cont++));
         }
       }
